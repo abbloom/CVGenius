@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVGenius — Dashboard Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0C0C0E;
+  --surface: #141417;
+  --surface2: #1C1C21;
+  --border: #2A2A32;
+  --border2: #333340;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.12);
+  --green: #22C55E;
+  --green-dim: rgba(34,197,94,0.1);
+  --red: #EF4444;
+  --red-dim: rgba(239,68,68,0.1);
+  --blue: #3B82F6;
+  --blue-dim: rgba(59,130,246,0.1);
+  --purple: #A855F7;
+  --white: #FFFFFF;
+  --grey: #6B7280;
+  --lgrey: #9CA3AF;
+  --text: #E5E7EB;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; display: flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px; min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 24px 0; position: fixed;
+  display: flex; flex-direction: column;
+}
+.sidebar-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.3rem; color: var(--white);
+  padding: 0 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.logo-star { color: var(--gold); }
+.sidebar-label {
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--grey); padding: 20px 20px 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 20px; cursor: pointer;
+  color: var(--grey); font-size: 0.88rem; font-weight: 500;
+  transition: all 0.18s; border-radius: 0;
+  position: relative; text-decoration: none;
+}
+.nav-item:hover { color: var(--text); background: var(--surface2); }
+.nav-item.active {
+  color: var(--white); background: var(--surface2);
+  border-left: 2px solid var(--gold);
+}
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto; background: var(--red);
+  color: white; font-size: 0.65rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px;
+}
+.sidebar-footer {
+  margin-top: auto; padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.admin-info {
+  display: flex; align-items: center; gap: 10px;
+}
+.admin-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #8B6914);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.78rem; color: var(--bg);
+}
+.admin-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+.admin-role { font-size: 0.72rem; color: var(--grey); }
+
+/* ── MAIN ── */
+.main {
+  margin-left: 240px; flex: 1;
+  padding: 32px 36px;
+  max-width: calc(100vw - 240px);
+}
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── TOPBAR ── */
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 32px;
+}
+.page-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.8rem; font-weight: 400; color: var(--white);
+}
+.page-sub { font-size: 0.85rem; color: var(--grey); margin-top: 2px; }
+.topbar-actions { display: flex; gap: 12px; align-items: center; }
+.btn-sm {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.82rem; font-weight: 600;
+  padding: 9px 18px; border-radius: 8px;
+  border: none; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 7px;
+}
+.btn-primary { background: var(--gold); color: var(--bg); }
+.btn-primary:hover { background: #D4B660; }
+.btn-outline { background: none; border: 1px solid var(--border2); color: var(--lgrey); }
+.btn-outline:hover { border-color: var(--lgrey); color: var(--text); }
+
+/* ── KPI CARDS ── */
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 28px;
+}
+.kpi-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 24px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.kpi-card:hover { border-color: var(--border2); }
+.kpi-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+}
+.kpi-card.gold::before { background: var(--gold); }
+.kpi-card.green::before { background: var(--green); }
+.kpi-card.blue::before { background: var(--blue); }
+.kpi-card.purple::before { background: var(--purple); }
+.kpi-label {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--grey);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.kpi-icon { font-size: 0.9rem; }
+.kpi-value {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.2rem; font-weight: 400; color: var(--white);
+  line-height: 1; margin-bottom: 10px;
+}
+.kpi-trend {
+  font-size: 0.78rem; display: flex; align-items: center; gap: 5px;
+}
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+.kpi-bar {
+  position: absolute; right: 20px; bottom: 20px;
+  display: flex; align-items: flex-end; gap: 3px; height: 36px;
+}
+.kpi-bar-col {
+  width: 5px; border-radius: 3px; background: var(--border2);
+  transition: background 0.2s;
+}
+.kpi-card.gold .kpi-bar-col.lit { background: var(--gold); }
+.kpi-card.green .kpi-bar-col.lit { background: var(--green); }
+.kpi-card.blue .kpi-bar-col.lit { background: var(--blue); }
+.kpi-card.purple .kpi-bar-col.lit { background: var(--purple); }
+
+/* ── CHARTS ROW ── */
+.charts-row {
+  display: grid; grid-template-columns: 2fr 1fr;
+  gap: 16px; margin-bottom: 28px;
+}
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+}
+.card-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 24px;
+}
+.card-title {
+  font-size: 0.92rem; font-weight: 600; color: var(--white);
+}
+.card-sub { font-size: 0.75rem; color: var(--grey); margin-top: 2px; }
+.card-badge {
+  font-size: 0.7rem; font-weight: 600; padding: 4px 10px;
+  border-radius: 6px; white-space: nowrap;
+}
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-gold { background: var(--gold-dim); color: var(--gold); }
+
+/* Chart canvas */
+.chart-wrap { position: relative; }
+canvas { width: 100% !important; }
+
+/* Donut */
+.donut-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 20px;
+}
+.donut-center {
+  text-align: center; position: relative;
+}
+.donut-val {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem; color: var(--white); font-weight: 400;
+}
+.donut-label { font-size: 0.72rem; color: var(--grey); }
+.donut-legend {
+  width: 100%; display: flex; flex-direction: column; gap: 10px;
+}
+.legend-item {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.82rem;
+}
+.legend-dot-wrap { display: flex; align-items: center; gap: 8px; color: var(--lgrey); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.legend-val { font-weight: 600; color: var(--text); }
+.legend-pct { font-size: 0.72rem; color: var(--grey); }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.85rem;
+}
+thead th {
+  text-align: left; padding: 10px 16px;
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--grey); border-bottom: 1px solid var(--border);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+tbody tr:hover { background: var(--surface2); }
+tbody tr:last-child { border-bottom: none; }
+td { padding: 14px 16px; color: var(--text); }
+.td-name { font-weight: 500; color: var(--white); }
+.td-email { color: var(--grey); font-size: 0.82rem; }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+}
+.status-paid { background: var(--green-dim); color: var(--green); }
+.status-free { background: var(--blue-dim); color: var(--blue); }
+.status-refund { background: var(--red-dim); color: var(--red); }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* ── CODES PAGE ── */
+.codes-header {
+  display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-end;
+}
+.input-wrap {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.input-label {
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey);
+}
+.input-field {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem; color: var(--text);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 10px 16px;
+  outline: none; transition: border-color 0.2s; min-width: 200px;
+}
+.input-field:focus { border-color: var(--gold); }
+select.input-field option { background: var(--surface2); }
+.code-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.code-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.code-value {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.2rem; font-weight: 700; letter-spacing: 0.08em;
+  color: var(--gold); font-feature-settings: 'tnum';
+}
+.code-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.78rem;
+}
+.code-plan { color: var(--lgrey); }
+.code-actions { display: flex; gap: 8px; }
+.code-btn {
+  font-size: 0.72rem; padding: 5px 10px;
+  border-radius: 6px; border: 1px solid var(--border2);
+  background: none; color: var(--lgrey); cursor: pointer;
+  transition: all 0.2s;
+}
+.code-btn:hover { border-color: var(--gold); color: var(--gold); }
+.code-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+/* ── EMAIL PAGE ── */
+.email-template {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; margin-bottom: 16px;
+}
+.email-header-bar {
+  background: var(--surface); padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.email-name { font-weight: 600; font-size: 0.9rem; }
+.email-trigger {
+  font-size: 0.72rem; background: var(--gold-dim);
+  color: var(--gold); padding: 3px 10px; border-radius: 10px;
+  font-weight: 600;
+}
+.email-body-prev {
+  padding: 20px; font-size: 0.85rem; color: var(--lgrey);
+  line-height: 1.6;
+}
+.email-body-prev strong { color: var(--text); }
+
+/* ── STATS PAGE ── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 14px; margin-bottom: 24px;
+}
+.stat-mini {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px;
+}
+.stat-mini-label { font-size: 0.72rem; color: var(--grey); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.stat-mini-val {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.8rem; color: var(--white); font-weight: 400;
+}
+.stat-mini-sub { font-size: 0.75rem; color: var(--grey); margin-top: 4px; }
+.progress-bar-wrap { margin-top: 10px; }
+.progress-bar {
+  height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden;
+}
+.progress-fill { height: 100%; border-radius: 2px; background: var(--gold); }
+
+/* ── ALERT ── */
+.alert {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 18px; border-radius: 10px; margin-bottom: 20px;
+  font-size: 0.85rem;
+}
+.alert-info { background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.2); color: #93C5FD; }
+.alert-success { background: var(--green-dim); border: 1px solid rgba(34,197,94,0.2); color: #86EFAC; }
+
+/* ── TOAST ── */
+.toast-admin {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--green); color: white;
+  padding: 12px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transform: translateY(60px); opacity: 0; transition: all 0.35s;
+  z-index: 999;
+}
+.toast-admin.show { transform: none; opacity: 1; }
+
+@media (max-width: 1100px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; max-width: 100vw; padding: 20px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-star">✦</span> CVGenius
+  </div>
+  <div class="sidebar-label">Principal</div>
+  <a class="nav-item active" onclick="showPage('dashboard', this)">
+    <span class="nav-icon">📊</span> Dashboard
+  </a>
+  <a class="nav-item" onclick="showPage('clients', this)">
+    <span class="nav-icon">👥</span> Clients
+    <span class="nav-badge" id="notif-clients">3</span>
+  </a>
+  <a class="nav-item" onclick="showPage('codes', this)">
+    <span class="nav-icon">🔑</span> Codes d'accès
+  </a>
+  <div class="sidebar-label">Outils</div>
+  <a class="nav-item" onclick="showPage('emails', this)">
+    <span class="nav-icon">✉️</span> Emails auto
+  </a>
+  <a class="nav-item" onclick="showPage('stats', this)">
+    <span class="nav-icon">📈</span> Statistiques
+  </a>
+  <a class="nav-item" href="cv-generator.html" target="_blank">
+    <span class="nav-icon">🔗</span> Voir le site
+  </a>
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar">AD</div>
+      <div>
+        <div class="admin-name">Admin</div>
+        <div class="admin-role">CVGenius.fr</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- ════ PAGE: DASHBOARD ════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub" id="current-date">Chargement...</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sm btn-outline" onclick="exportCSV()">⬇ Exporter CSV</button>
+        <button class="btn-sm btn-primary" onclick="showPage('codes', document.querySelector('[onclick*=codes]'))">+ Générer codes</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card gold">
+        <div class="kpi-label"><span class="kpi-icon">💰</span> Revenus ce mois</div>
+        <div class="kpi-value" id="kpi-revenue">€0</div>
+        <div class="kpi-trend trend-up" id="kpi-rev-trend">↑ +0% vs mois dernier</div>
+        <div class="kpi-bar" id="bar-rev"></div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label"><span class="kpi-icon">🧾</span> Ventes ce mois</div>
+        <div class="kpi-value" id="kpi-sales">0</div>
+        <div class="kpi-trend trend-up" id="kpi-sales-trend">↑ +0 vs semaine dernière</div>
+        <div class="kpi-bar" id="bar-sales"></div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label"><span class="kpi-icon">👤</span> Utilisateurs actifs</div>
+        <div class="kpi-value" id="kpi-users">0</div>
+        <div class="kpi-trend trend-up">↑ Depuis le lancement</div>
+        <div class="kpi-bar" id="bar-users"></div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label"><span class="kpi-icon">📄</span> CV générés</div>
+        <div class="kpi-value" id="kpi-cvs">0</div>
+        <div class="kpi-trend trend-up">↑ Aujourd'hui</div>
+        <div class="kpi-bar" id="bar-cvs"></div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Revenus (30 derniers jours)</div>
+            <div class="card-sub">Paiements uniques + abonnements</div>
+          </div>
+          <span class="card-badge badge-green" id="rev-badge">+0%</span>
+        </div>
+        <canvas id="revenue-chart" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Plans vendus</div>
+            <div class="card-sub">Répartition ce mois</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <div class="donut-center">
+            <canvas id="donut-chart" width="160" height="160"></canvas>
+          </div>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent sales -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Dernières ventes</div>
+          <div class="card-sub">Transactions récentes</div>
+        </div>
+        <button class="btn-sm btn-outline" onclick="showPage('clients', document.querySelector('[onclick*=clients]'))">Voir tout</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Plan</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Date</th>
+              <th>Code</th>
+            </tr>
+          </thead>
+          <tbody id="recent-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: CLIENTS ════ -->
+  <div class="page" id="page-clients">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Clients</div>
+        <div class="page-sub">Tous les utilisateurs enregistrés</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sm btn-outline" onclick="exportCSV()">⬇ CSV</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:0">
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <input class="input-field" type="search" placeholder="🔍 Chercher un client..." oninput="filterTable(this.value)" style="min-width:260px">
+          <select class="input-field" onchange="filterStatus(this.value)" style="min-width:160px">
+            <option value="">Tous les statuts</option>
+            <option value="paid">Premium</option>
+            <option value="free">Gratuit</option>
+            <option value="refund">Remboursé</option>
+          </select>
+        </div>
+        <span class="card-badge badge-gold" id="clients-count">0 clients</span>
+      </div>
+      <div class="table-wrap" style="margin-top:20px">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Plan</th>
+              <th>Montant payé</th>
+              <th>Code utilisé</th>
+              <th>Date</th>
+              <th>CV générés</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clients-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: CODES ════ -->
+  <div class="page" id="page-codes">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Codes d'accès</div>
+        <div class="page-sub">Génération et gestion des codes premium</div>
+      </div>
+    </div>
+    <div class="alert alert-info">
+      <span>ℹ️</span>
+      <div>Ces codes sont envoyés aux clients après paiement. Chaque code est à usage unique. Ajoutez-les aussi dans le fichier <strong>CVGenius-avec-Stripe.html</strong> dans la section <code>validCodes</code>.</div>
+    </div>
+    <div class="codes-header">
+      <div class="input-wrap">
+        <div class="input-label">Plan</div>
+        <select class="input-field" id="code-plan">
+          <option value="basic">Essentiel (4,90€)</option>
+          <option value="pro" selected>Illimité (9,90€)</option>
+          <option value="monthly">Mensuel</option>
+          <option value="yearly">Annuel</option>
+        </select>
+      </div>
+      <div class="input-wrap">
+        <div class="input-label">Email client</div>
+        <input class="input-field" type="email" id="code-email" placeholder="client@email.com">
+      </div>
+      <div class="input-wrap">
+        <div class="input-label">Quantité</div>
+        <select class="input-field" id="code-qty">
+          <option>1</option><option>3</option><option>5</option><option>10</option>
+        </select>
+      </div>
+      <button class="btn-sm btn-primary" onclick="generateCodes()" style="align-self:flex-end;padding:12px 20px;">✦ Générer</button>
+    </div>
+    <div class="code-grid" id="codes-grid"></div>
+  </div>
+
+  <!-- ════ PAGE: EMAILS ════ -->
+  <div class="page" id="page-emails">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Emails automatiques</div>
+        <div class="page-sub">Modèles envoyés automatiquement à vos clients</div>
+      </div>
+    </div>
+    <div class="alert alert-success">
+      <span>✅</span>
+      <div>Ces templates sont prêts à être utilisés. Configurez-les dans votre outil d'emailing (Brevo, Mailchimp, ou directement via Stripe). <strong>Instructions détaillées ci-dessous.</strong></div>
+    </div>
+
+    <div class="email-template">
+      <div class="email-header-bar">
+        <div>
+          <div class="email-name">🎉 Email de bienvenue — Paiement confirmé</div>
+          <div style="font-size:0.78rem;color:var(--grey);margin-top:3px">Objet : Votre accès CVGenius est activé ✦</div>
+        </div>
+        <span class="email-trigger">Déclencheur : paiement Stripe réussi</span>
+      </div>
+      <div class="email-body-prev">
+        Bonjour <strong>[Prénom]</strong>,<br><br>
+        Merci pour votre achat ! Votre accès <strong>CVGenius Premium</strong> est maintenant actif.<br><br>
+        🔑 <strong>Votre code d'accès personnel : <span style="color:var(--gold);font-family:monospace">[CODE]</span></strong><br><br>
+        Comment l'utiliser :<br>
+        1. Allez sur <strong>cvgenius.fr</strong><br>
+        2. Cliquez sur <strong>"J'ai déjà un code"</strong><br>
+        3. Entrez votre code et créez vos CV en illimité<br><br>
+        À très bientôt !<br>
+        <em>L'équipe CVGenius</em>
+      </div>
+    </div>
+
+    <div class="email-template">
+      <div class="email-header-bar">
+        <div>
+          <div class="email-name">⏰ Relance J+3 — Utilisateurs gratuits inactifs</div>
+          <div style="font-size:0.78rem;color:var(--grey);margin-top:3px">Objet : Votre CV n'est pas encore créé...</div>
+        </div>
+        <span class="email-trigger">Déclencheur : J+3 sans génération</span>
+      </div>
+      <div class="email-body-prev">
+        Bonjour <strong>[Prénom]</strong>,<br><br>
+        Vous vous êtes inscrit(e) sur CVGenius il y a 3 jours, mais votre CV n'est pas encore créé.<br><br>
+        💡 Saviez-vous que les candidats avec un CV optimisé par IA reçoivent <strong>3× plus de réponses</strong> en moyenne ?<br><br>
+        Il suffit de <strong>2 minutes</strong>. Votre CV vous attend.<br><br>
+        <span style="color:var(--gold)">→ Créer mon CV maintenant</span><br><br>
+        <em>L'équipe CVGenius</em>
+      </div>
+    </div>
+
+    <div class="email-template">
+      <div class="email-header-bar">
+        <div>
+          <div class="email-name">💎 Upsell J+1 — Après 1ère génération gratuite</div>
+          <div style="font-size:0.78rem;color:var(--grey);margin-top:3px">Objet : Votre CV est prêt — passez à l'illimité</div>
+        </div>
+        <span class="email-trigger">Déclencheur : après 1ère génération</span>
+      </div>
+      <div class="email-body-prev">
+        Bonjour <strong>[Prénom]</strong>,<br><br>
+        Félicitations pour votre premier CV ! Vous avez encore <strong>1 génération gratuite</strong> disponible.<br><br>
+        Pour créer des CV adaptés à <em>chaque candidature</em> sans limite, débloquez l'accès Premium :<br><br>
+        ✦ CV illimités · Lettres de motivation illimitées · Toujours à jour<br><br>
+        <strong>Offre limitée : 9,90€ à vie</strong> (au lieu de 9,90€/mois)<br><br>
+        <span style="color:var(--gold)">→ Débloquer Premium maintenant</span>
+      </div>
+    </div>
+
+    <div class="email-template">
+      <div class="email-header-bar">
+        <div>
+          <div class="email-name">🔄 Renouvellement abonnement mensuel</div>
+          <div style="font-size:0.78rem;color:var(--grey);margin-top:3px">Objet : Votre abonnement CVGenius se renouvelle demain</div>
+        </div>
+        <span class="email-trigger">Déclencheur : J-1 avant renouvellement Stripe</span>
+      </div>
+      <div class="email-body-prev">
+        Bonjour <strong>[Prénom]</strong>,<br><br>
+        Votre abonnement CVGenius Mensuel se renouvelle demain pour <strong>4,90€</strong>.<br><br>
+        Si vous souhaitez continuer à créer des CV illimités, aucune action n'est nécessaire.<br><br>
+        Vous pouvez gérer ou annuler votre abonnement à tout moment depuis votre espace client Stripe.<br><br>
+        <em>L'équipe CVGenius — support@cvgenius.fr</em>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-title" style="margin-bottom:16px">📋 Guide de configuration</div>
+      <div style="font-size:0.88rem;color:var(--lgrey);line-height:1.8">
+        <strong style="color:var(--text)">Option 1 — Brevo (gratuit jusqu'à 300 emails/jour)</strong><br>
+        1. Créez un compte sur brevo.com<br>
+        2. Allez dans "Automatisation" → "Créer un workflow"<br>
+        3. Déclencheur : "Webhook entrant" (connectez votre Stripe)<br>
+        4. Action : "Envoyer un email" → collez le template ci-dessus<br>
+        5. Dans Stripe → Webhooks → Ajouter endpoint → URL Brevo<br><br>
+        <strong style="color:var(--text)">Option 2 — Stripe + Email direct (le plus simple)</strong><br>
+        1. Dans Stripe → "Paramètres" → "Emails clients" → Activer<br>
+        2. Stripe envoie automatiquement la confirmation de paiement<br>
+        3. Vous, vous envoyez manuellement le code (vérifiez vos paiements chaque jour)<br><br>
+        <strong style="color:var(--text)">Option 3 — Zapier (automatisation sans code)</strong><br>
+        1. zapier.com → Nouveau Zap<br>
+        2. Déclencheur : "Stripe — Paiement réussi"<br>
+        3. Action : "Gmail — Envoyer un email" avec le template<br>
+        4. Variable [CODE] : générez via ce dashboard → copiez dans le Zap
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: STATS ════ -->
+  <div class="page" id="page-stats">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Statistiques</div>
+        <div class="page-sub">Performance de votre activité</div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-mini">
+        <div class="stat-mini-label">Taux de conversion</div>
+        <div class="stat-mini-val" id="stat-conv">0%</div>
+        <div class="stat-mini-sub">Visiteurs → Premium</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="conv-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Revenu moyen / client</div>
+        <div class="stat-mini-val" id="stat-arpu">€0</div>
+        <div class="stat-mini-sub">ARPU — Average Revenue Per User</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Remboursements</div>
+        <div class="stat-mini-val" id="stat-refund">0%</div>
+        <div class="stat-mini-sub">Taux de remboursement</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Plan le plus vendu</div>
+        <div class="stat-mini-val" id="stat-top">—</div>
+        <div class="stat-mini-sub">Par volume de ventes</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Revenu projeté (30j)</div>
+        <div class="stat-mini-val" id="stat-proj">€0</div>
+        <div class="stat-mini-sub">Basé sur le rythme actuel</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">LTV estimée</div>
+        <div class="stat-mini-val" id="stat-ltv">€0</div>
+        <div class="stat-mini-sub">Valeur vie client</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:20px">Revenus cumulés</div>
+      <canvas id="cumul-chart" height="160"></canvas>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── TOAST ── -->
+<div class="toast-admin" id="toast-admin"></div>
+
+<script>
+// ════════════════════════════════════════════
+// DATA STORE — Simule une vraie base de données
+// En production : remplacer par appels API
+// ════════════════════════════════════════════
+let DB = {
+  clients: [],
+  codes: [],
+  revenue: [], // revenus journaliers 30j
+};
+
+// ── INITIALISATION ──
+function initDB() {
+  // Charger données sauvegardées
+  try {
+    const saved = localStorage.getItem('cvgenius_admin');
+    if (saved) {
+      DB = JSON.parse(saved);
+    } else {
+      seedDemoData();
+    }
+  } catch { seedDemoData(); }
+  renderAll();
+}
+
+function saveDB() {
+  try { localStorage.setItem('cvgenius_admin', JSON.stringify(DB)); } catch {}
+}
+
+// ── DEMO DATA ──
+function seedDemoData() {
+  const plans = ['pro', 'basic', 'monthly', 'yearly', 'free'];
+  const planPrices = { pro: 9.90, basic: 4.90, monthly: 4.90, yearly: 23.88, free: 0 };
+  const planNames = { pro: 'Illimité', basic: 'Essentiel', monthly: 'Mensuel', yearly: 'Annuel', free: 'Gratuit' };
+  const names = ['Marie L.', 'Samuel R.', 'Patricia D.', 'Jean M.', 'Sophie B.', 'Alex T.', 'Claire N.', 'Thomas V.', 'Isabelle K.', 'Lucas F.', 'Emma G.', 'Romain H.'];
+  const domains = ['gmail.com', 'outlook.com', 'yahoo.fr', 'hotmail.fr', 'free.fr'];
+
+  DB.clients = names.map((name, i) => {
+    const plan = plans[Math.floor(Math.random() * plans.length)];
+    const daysAgo = Math.floor(Math.random() * 28);
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    const first = name.split(' ')[0].toLowerCase();
+    return {
+      id: `CLI${String(i+1).padStart(3,'0')}`,
+      name,
+      email: `${first}.${String.fromCharCode(97+i)}@${domains[i % domains.length]}`,
+      plan,
+      planName: planNames[plan],
+      amount: planPrices[plan],
+      code: plan !== 'free' ? generateCodeStr() : '—',
+      date: date.toISOString(),
+      cvCount: Math.floor(Math.random() * 8) + 1,
+      status: plan === 'free' ? 'free' : (Math.random() > 0.9 ? 'refund' : 'paid'),
+    };
+  });
+
+  // Revenus journaliers (30 jours)
+  DB.revenue = Array.from({length: 30}, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (29-i));
+    return {
+      date: d.toLocaleDateString('fr', {day:'2-digit', month:'short'}),
+      amount: Math.round((Math.random() * 80 + 10) * 100) / 100,
+    };
+  });
+
+  // Codes existants
+  DB.codes = [
+    { code: 'DEMO-2025', plan: 'pro', planName: 'Illimité', email: 'demo@cvgenius.fr', used: false, date: new Date().toISOString() },
+    { code: 'BETA-TEST', plan: 'pro', planName: 'Illimité', email: 'beta@cvgenius.fr', used: false, date: new Date().toISOString() },
+  ];
+
+  saveDB();
+}
+
+// ── CODE GENERATOR ──
+function generateCodeStr() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length: 4}, () => chars[Math.floor(Math.random()*chars.length)]).join('') + '-' +
+         Array.from({length: 4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+// ── COMPUTED METRICS ──
+function getMetrics() {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const thisMonth = DB.clients.filter(c => new Date(c.date) >= monthStart && c.status === 'paid');
+  const revenue = thisMonth.reduce((s, c) => s + c.amount, 0);
+  const totalRev = DB.clients.filter(c => c.status === 'paid').reduce((s,c) => s+c.amount, 0);
+  const totalPaid = DB.clients.filter(c => c.status === 'paid').length;
+  const totalCVs = DB.clients.reduce((s,c) => s+c.cvCount, 0);
+  const refunds = DB.clients.filter(c => c.status === 'refund').length;
+  const planCount = {};
+  DB.clients.filter(c=>c.status==='paid').forEach(c => { planCount[c.planName] = (planCount[c.planName]||0)+1; });
+  const topPlan = Object.entries(planCount).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+  const revThisMonth = DB.revenue.slice(-30).reduce((s,d)=>s+d.amount,0);
+  return {
+    revenue: revenue.toFixed(2),
+    sales: thisMonth.length,
+    users: DB.clients.length,
+    cvs: totalCVs,
+    totalPaid, totalRev,
+    convRate: DB.clients.length ? ((totalPaid / DB.clients.length) * 100).toFixed(1) : 0,
+    arpu: totalPaid ? (totalRev / totalPaid).toFixed(2) : 0,
+    refundRate: DB.clients.length ? ((refunds / DB.clients.length) * 100).toFixed(1) : 0,
+    topPlan,
+    projected: (revThisMonth / 30 * 30).toFixed(2),
+    ltv: totalPaid ? (totalRev / totalPaid * 1.8).toFixed(2) : 0,
+    planCount,
+  };
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  const m = getMetrics();
+  updateDate();
+  renderKPIs(m);
+  renderRecentTable();
+  renderClientsTable();
+  renderCodesGrid();
+  renderStats(m);
+  drawRevenueChart();
+  drawDonutChart(m);
+  drawCumulChart();
+  document.getElementById('clients-count').textContent = `${DB.clients.length} clients`;
+}
+
+function updateDate() {
+  const now = new Date();
+  document.getElementById('current-date').textContent =
+    now.toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+
+// ── KPIS ──
+function renderKPIs(m) {
+  document.getElementById('kpi-revenue').textContent = `€${m.revenue}`;
+  document.getElementById('kpi-sales').textContent = m.sales;
+  document.getElementById('kpi-users').textContent = m.users;
+  document.getElementById('kpi-cvs').textContent = m.cvs;
+  document.getElementById('kpi-rev-trend').textContent = `↑ +${Math.floor(Math.random()*30+5)}% vs mois dernier`;
+  document.getElementById('kpi-sales-trend').textContent = `↑ +${Math.floor(Math.random()*5+1)} cette semaine`;
+
+  // Mini bar charts
+  const barData = { rev: [40,55,30,70,60,80,90], sales: [2,4,1,5,3,6,4], users: [10,15,12,18,14,20,16], cvs: [5,8,6,12,9,14,11] };
+  ['rev','sales','users','cvs'].forEach(key => {
+    const el = document.getElementById(`bar-${key}`);
+    if (!el) return;
+    const max = Math.max(...barData[key]);
+    el.innerHTML = barData[key].map((v, i) => {
+      const h = Math.round((v/max)*32);
+      const lit = i >= barData[key].length - 3;
+      return `<div class="kpi-bar-col ${lit?'lit':''}" style="height:${h}px"></div>`;
+    }).join('');
+  });
+}
+
+// ── TABLES ──
+function renderRecentTable() {
+  const recent = [...DB.clients].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0, 7);
+  document.getElementById('recent-table').innerHTML = recent.map(c => `
+    <tr>
+      <td><div class="td-name">${c.name}</div><div class="td-email">${c.email}</div></td>
+      <td>${c.planName}</td>
+      <td>${c.amount > 0 ? '€'+c.amount.toFixed(2) : '—'}</td>
+      <td><span class="status-badge status-${c.status}"><span class="status-dot"></span>${c.status==='paid'?'Premium':c.status==='free'?'Gratuit':'Remboursé'}</span></td>
+      <td>${new Date(c.date).toLocaleDateString('fr')}</td>
+      <td style="font-family:monospace;color:var(--gold);font-size:0.82rem">${c.code}</td>
+    </tr>`).join('');
+}
+
+let currentFilter = '';
+let currentStatusFilter = '';
+
+function renderClientsTable(filter = currentFilter, statusF = currentStatusFilter) {
+  let data = [...DB.clients].sort((a,b) => new Date(b.date)-new Date(a.date));
+  if (filter) data = data.filter(c =>
+    c.name.toLowerCase().includes(filter.toLowerCase()) ||
+    c.email.toLowerCase().includes(filter.toLowerCase())
+  );
+  if (statusF) data = data.filter(c => c.status === statusF);
+  document.getElementById('clients-count').textContent = `${data.length} clients`;
+  document.getElementById('clients-table').innerHTML = data.map(c => `
+    <tr>
+      <td class="td-name">${c.name}</td>
+      <td class="td-email">${c.email}</td>
+      <td>${c.planName}</td>
+      <td>${c.amount > 0 ? '<span style="color:var(--gold);font-weight:600">€'+c.amount.toFixed(2)+'</span>' : '—'}</td>
+      <td style="font-family:monospace;color:var(--gold);font-size:0.82rem">${c.code}</td>
+      <td>${new Date(c.date).toLocaleDateString('fr')}</td>
+      <td style="text-align:center">${c.cvCount}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          ${c.status === 'paid' ? `<button class="code-btn" onclick="resendCode('${c.id}')">✉ Renvoyer</button>` : ''}
+          <button class="code-btn danger" onclick="refundClient('${c.id}')">Rembourser</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterTable(v) { currentFilter = v; renderClientsTable(); }
+function filterStatus(v) { currentStatusFilter = v; renderClientsTable(); }
+
+// ── CODES ──
+function generateCodes() {
+  const plan = document.getElementById('code-plan').value;
+  const email = document.getElementById('code-email').value;
+  const qty = parseInt(document.getElementById('code-qty').value);
+  const planNames = { basic: 'Essentiel', pro: 'Illimité', monthly: 'Mensuel', yearly: 'Annuel' };
+
+  for (let i = 0; i < qty; i++) {
+    DB.codes.unshift({
+      code: generateCodeStr(),
+      plan, planName: planNames[plan],
+      email: email || '—',
+      used: false,
+      date: new Date().toISOString(),
+    });
+  }
+  saveDB();
+  renderCodesGrid();
+  toast(`✦ ${qty} code${qty>1?'s':''} généré${qty>1?'s':''} !`);
+}
+
+function renderCodesGrid() {
+  document.getElementById('codes-grid').innerHTML = DB.codes.map((c, i) => `
+    <div class="code-card" style="${c.used ? 'opacity:0.4' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="code-value">${c.code}</div>
+        <span class="status-badge ${c.used ? 'status-free' : 'status-paid'}">${c.used ? 'Utilisé' : 'Actif'}</span>
+      </div>
+      <div class="code-meta">
+        <span class="code-plan">${c.planName} · ${c.email !== '—' ? c.email : 'Sans email'}</span>
+        <span style="color:var(--grey);font-size:0.72rem">${new Date(c.date).toLocaleDateString('fr')}</span>
+      </div>
+      <div class="code-actions">
+        <button class="code-btn" onclick="copyCode('${c.code}')">📋 Copier</button>
+        ${c.email !== '—' ? `<button class="code-btn" onclick="emailCode(${i})">✉ Email</button>` : ''}
+        <button class="code-btn danger" onclick="deleteCode(${i})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(() => toast('✓ Code copié !'));
+}
+
+function emailCode(i) {
+  const c = DB.codes[i];
+  const body = encodeURIComponent(`Bonjour,\n\nVoici votre code d'accès CVGenius Premium :\n\n${c.code}\n\nComment l'utiliser :\n1. Allez sur cvgenius.fr\n2. Cliquez sur "J'ai déjà un code"\n3. Entrez votre code\n\nBonne utilisation !\nL'équipe CVGenius`);
+  const subject = encodeURIComponent('Votre accès CVGenius Premium ✦');
+  window.open(`mailto:${c.email}?subject=${subject}&body=${body}`);
+}
+
+function deleteCode(i) {
+  if (confirm('Supprimer ce code ?')) {
+    DB.codes.splice(i, 1);
+    saveDB(); renderCodesGrid();
+    toast('✓ Code supprimé');
+  }
+}
+
+// ── CLIENT ACTIONS ──
+function resendCode(id) {
+  const c = DB.clients.find(c => c.id === id);
+  if (!c) return;
+  const body = encodeURIComponent(`Bonjour ${c.name.split(' ')[0]},\n\nVoici votre code d'accès CVGenius :\n\n${c.code}\n\nBonne utilisation !\nL'équipe CVGenius`);
+  const subject = encodeURIComponent('Votre code CVGenius ✦');
+  window.open(`mailto:${c.email}?subject=${subject}&body=${body}`);
+  toast('✉ Email ouvert !');
+}
+
+function refundClient(id) {
+  if (!confirm('Marquer comme remboursé ?')) return;
+  const c = DB.clients.find(c => c.id === id);
+  if (c) { c.status = 'refund'; saveDB(); renderAll(); toast('✓ Remboursement enregistré'); }
+}
+
+// ── STATS ──
+function renderStats(m) {
+  document.getElementById('stat-conv').textContent = m.convRate + '%';
+  document.getElementById('stat-arpu').textContent = '€' + m.arpu;
+  document.getElementById('stat-refund').textContent = m.refundRate + '%';
+  document.getElementById('stat-top').textContent = m.topPlan;
+  document.getElementById('stat-proj').textContent = '€' + m.projected;
+  document.getElementById('stat-ltv').textContent = '€' + m.ltv;
+  document.getElementById('conv-bar').style.width = Math.min(parseFloat(m.convRate) * 3, 100) + '%';
+}
+
+// ── CHARTS ──
+function drawRevenueChart() {
+  const canvas = document.getElementById('revenue-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const data = DB.revenue;
+  const W = canvas.offsetWidth || 560; const H = 200;
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+  const max = Math.max(...data.map(d => d.amount));
+  const pad = { top:20, right:10, bottom:30, left:40 };
+  const pw = W - pad.left - pad.right;
+  const ph = H - pad.top - pad.bottom;
+  const step = pw / (data.length - 1);
+
+  // Grid
+  ctx.strokeStyle = '#2A2A32'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (ph / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#6B7280'; ctx.font = '10px Plus Jakarta Sans';
+    ctx.textAlign = 'right';
+    ctx.fillText('€' + Math.round(max - (max/4)*i), pad.left - 5, y + 4);
+  }
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+  grad.addColorStop(0, 'rgba(201,168,76,0.25)');
+  grad.addColorStop(1, 'rgba(201,168,76,0)');
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top + ph);
+  data.forEach((d, i) => {
+    const x = pad.left + i * step;
+    const y = pad.top + ph - (d.amount / max) * ph;
+    i === 0 ? ctx.lineTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(pad.left + (data.length-1)*step, pad.top + ph);
+  ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+
+  // Line
+  ctx.beginPath(); ctx.strokeStyle = '#C9A84C'; ctx.lineWidth = 2;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  data.forEach((d, i) => {
+    const x = pad.left + i * step;
+    const y = pad.top + ph - (d.amount / max) * ph;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Labels (every 7 days)
+  ctx.fillStyle = '#6B7280'; ctx.font = '9px Plus Jakarta Sans'; ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    if (i % 7 === 0) ctx.fillText(d.date, pad.left + i * step, H - 5);
+  });
+
+  // Revenue badge
+  const total = data.reduce((s,d) => s+d.amount, 0);
+  const pct = Math.floor(Math.random()*30+5);
+  document.getElementById('rev-badge').textContent = `+${pct}%`;
+}
+
+function drawDonutChart(m) {
+  const canvas = document.getElementById('donut-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const size = 160; canvas.width = size; canvas.height = size;
+  const cx = size/2, cy = size/2, r = 60, inner = 40;
+  const plans = Object.entries(m.planCount);
+  const total = plans.reduce((s, [,v]) => s+v, 0);
+  const colors = ['#C9A84C','#22C55E','#3B82F6','#A855F7','#EF4444'];
+  let angle = -Math.PI/2;
+
+  if (!total) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.strokeStyle = '#2A2A32'; ctx.lineWidth = 20; ctx.stroke();
+  } else {
+    plans.forEach(([name, val], i) => {
+      const slice = (val / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, angle, angle + slice);
+      ctx.closePath();
+      ctx.fillStyle = colors[i % colors.length]; ctx.fill();
+      angle += slice;
+    });
+    // Inner hole
+    ctx.beginPath(); ctx.arc(cx, cy, inner, 0, Math.PI*2);
+    ctx.fillStyle = '#141417'; ctx.fill();
+  }
+
+  // Center text
+  ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 18px Plus Jakarta Sans';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(total, cx, cy-5);
+  ctx.fillStyle = '#6B7280'; ctx.font = '9px Plus Jakarta Sans';
+  ctx.fillText('VENTES', cx, cy+10);
+
+  // Legend
+  document.getElementById('donut-legend').innerHTML = plans.map(([name, val], i) => `
+    <div class="legend-item">
+      <div class="legend-dot-wrap">
+        <div class="legend-dot" style="background:${colors[i%colors.length]}"></div>
+        ${name}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="legend-val">${val}</div>
+        <div class="legend-pct">${total ? Math.round(val/total*100) : 0}%</div>
+      </div>
+    </div>`).join('');
+}
+
+function drawCumulChart() {
+  const canvas = document.getElementById('cumul-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 700; const H = 160;
+  canvas.width = W; canvas.height = H;
+  const data = DB.revenue;
+  let cumul = 0;
+  const cumulData = data.map(d => { cumul += d.amount; return cumul; });
+  const max = cumulData[cumulData.length-1] || 1;
+  const pad = { top:15, right:10, bottom:25, left:55 };
+  const pw = W-pad.left-pad.right; const ph = H-pad.top-pad.bottom;
+  const step = pw/(data.length-1);
+
+  ctx.strokeStyle = '#2A2A32'; ctx.lineWidth = 0.5;
+  for (let i=0;i<=3;i++) {
+    const y = pad.top+(ph/3)*i;
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(W-pad.right,y); ctx.stroke();
+    ctx.fillStyle='#6B7280'; ctx.font='10px Plus Jakarta Sans'; ctx.textAlign='right';
+    ctx.fillText('€'+Math.round(max-(max/3)*i), pad.left-5, y+4);
+  }
+
+  const grad = ctx.createLinearGradient(0,pad.top,0,H-pad.bottom);
+  grad.addColorStop(0,'rgba(34,197,94,0.2)'); grad.addColorStop(1,'rgba(34,197,94,0)');
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top+ph);
+  cumulData.forEach((v,i) => {
+    const x=pad.left+i*step; const y=pad.top+ph-(v/max)*ph;
+    i===0?ctx.lineTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.lineTo(pad.left+(data.length-1)*step, pad.top+ph);
+  ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+
+  ctx.beginPath(); ctx.strokeStyle='#22C55E'; ctx.lineWidth=2;
+  ctx.lineJoin='round'; ctx.lineCap='round';
+  cumulData.forEach((v,i) => {
+    const x=pad.left+i*step; const y=pad.top+ph-(v/max)*ph;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+
+// ── EXPORT CSV ──
+function exportCSV() {
+  const rows = [['ID','Nom','Email','Plan','Montant','Code','Date','CVs','Statut']];
+  DB.clients.forEach(c => rows.push([c.id, c.name, c.email, c.planName, c.amount, c.code, new Date(c.date).toLocaleDateString('fr'), c.cvCount, c.status]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `cvgenius-clients-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('✓ Export CSV téléchargé');
+}
+
+// ── NAVIGATION ──
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'stats') { setTimeout(() => { drawCumulChart(); }, 100); }
+  if (name === 'dashboard') { setTimeout(() => { drawRevenueChart(); drawDonutChart(getMetrics()); }, 100); }
+}
+
+// ── TOAST ──
+let toastT;
+function toast(msg) {
+  const el = document.getElementById('toast-admin');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── INIT ──
+initDB();
+
+// Redraw charts on resize
+window.addEventListener('resize', () => {
+  if (document.getElementById('page-dashboard').classList.contains('active')) {
+    drawRevenueChart(); drawDonutChart(getMetrics());
+  }
+  if (document.getElementById('page-stats').classList.contains('active')) drawCumulChart();
+});
+</script>
+</body>
+</html>
